@@ -1,0 +1,26 @@
+[
+  {
+    "model": "userrole.PermissionGroup",
+    "pk": 1,
+    "fields": {
+      "permission_group_name": "User"
+    }
+  },
+  {
+    "model": "userrole.AllPermission",
+    "pk": 1,
+    "fields": {
+      "permission_name": "user-create",
+      "permission_group_id": 1
+    }
+  },
+  {
+    "model": "userrole.AllPermission",
+    "pk": 2,
+    "fields": {
+      "permission_name": "user-read",
+      "permission_group_id": 1
+    }
+  }
+
+]
