@@ -127,17 +127,20 @@ class UserLoginSerializer(serializers.Serializer):
         email = data.get("email", None)
         password = data.get("password", None)
         user = authenticate(email=email, password=password)
+        print(user, "------------ user")
         if user is None:
+            print('no user found')
             raise serializers.ValidationError(
-                'A user with this email and password is not found.'
+                {"message" :'A user with this email and password is not found.'}
             )
         try:
             payload = JWT_PAYLOAD_HANDLER(user)
             jwt_token = JWT_ENCODE_HANDLER(payload)
             update_last_login(None, user)
         except User.DoesNotExist:
+            print('error')
             raise serializers.ValidationError(
-                'User with given email and password does not exists'
+                {"message":'User with given email and password does not exists'}
             )
         return {
             'email':user.email,

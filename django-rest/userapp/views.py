@@ -19,6 +19,17 @@ from .auth import JWTAuthentication
 from post.serializers import UserAddressSerializer
 from rest_framework import filters
 
+#import for login
+
+from rest_framework_jwt.settings import api_settings
+from django.contrib.auth.models import update_last_login
+from django.contrib.auth import authenticate
+JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
+JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
+# end
+
+
+
 class UserRegistrationView(CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = (AllowAny,)
@@ -42,17 +53,36 @@ class UserLoginView(RetrieveAPIView):
     serializer_class = UserLoginSerializer
 
     def post(self, request):
-        print(request, "---------------------")
+        data = request.data
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        response = {
-            'success' : 'True',
-            'status code' : status.HTTP_200_OK,
-            'message': 'User logged in  successfully',
-            'token' : serializer.data['token'],
-            }
-        status_code = status.HTTP_200_OK
 
+        email = data.get("email", None)
+        password = data.get("password", None)
+        user = authenticate(email=email, password=password)
+        response = None
+        status_code = 0
+
+        if user is None:
+            print('no user found')
+            response = {"message": 'Invalid email or password.'}
+        else:
+            try:
+                payload = JWT_PAYLOAD_HANDLER(user)
+                jwt_token = JWT_ENCODE_HANDLER(payload)
+                update_last_login(None, user)
+                response = {
+                    'success': 'True',
+                    'status_code': status.HTTP_200_OK,
+                    'message': 'User logged in  successfully',
+                    'token': jwt_token,
+                    "email": user.email
+                }
+            except User.DoesNotExist:
+                print('error')
+                response = {"message": 'Invalid email or password'}
+
+        status_code = status.HTTP_200_OK
+        print(response)
         return Response(response, status=status_code)
 
 class UserProfileView(RetrieveUpdateAPIView):
