@@ -15,7 +15,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from userapp.models import User
-from .auth import JWTAuthentication
+from .auth import JWTAuthentication, decodeToken
 from post.serializers import UserAddressSerializer
 from rest_framework import filters
 
@@ -93,6 +93,9 @@ class UserProfileView(RetrieveUpdateAPIView):
 
     def get(self, request):
         try:
+            headr = self.request.META.get('HTTP_AUTHORIZATION', None)
+            # print(headr, "----------------")
+            print(decodeToken(headr))
             # ur = UserSerializer(data=request.user)
             # print(ur, ur.is_valid())
             print(request.user, request.user.id )

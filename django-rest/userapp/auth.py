@@ -8,6 +8,22 @@ from .models import User
 from rest_framework_jwt.settings import api_settings
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 
+import jwt
+
+# class DecodeToken():
+def decodeToken( req_token):
+    auth_header = req_token.split()
+    # auth_header_prefix = authentication_header_prefix.lower()
+    # print(auth_header)
+    prefix = auth_header[0]#.decode('utf-8')
+    token = auth_header[1]#.decode('utf-8')
+    # print(token,"----", prefix)
+    # if prefix.lower() != auth_header_prefix:
+    #     # The auth header prefix is not what we expected. Do not attempt to
+    #     # authenticate.
+    #     return None
+
+    return jwt_decode_handler(token)
 
 class JWTAuthentication(authentication.BaseAuthentication):
     authentication_header_prefix = 'Bearer'
@@ -83,7 +99,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         # token = authentication.get_authorization_header(request).split()
         try:
             # payload = rest_framework_jwt.decode(token, settings.JWT_AUTH.JWT_SECRET_KEY,)
-            print(jwt_decode_handler(token))
+            # print(jwt_decode_handler(token), "-----------------------")
             payload = jwt_decode_handler(token)
         except:
             msg = 'Invalid authentication. Could not decode token.'
