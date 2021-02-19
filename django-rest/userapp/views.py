@@ -65,6 +65,8 @@ class UserLoginView(RetrieveAPIView):
         if user is None:
             print('no user found')
             response = {"message": 'Invalid email or password.'}
+            status_code = status.HTTP_400_BAD_REQUEST
+
         else:
             try:
                 payload = JWT_PAYLOAD_HANDLER(user)
@@ -77,11 +79,13 @@ class UserLoginView(RetrieveAPIView):
                     'token': jwt_token,
                     "email": user.email
                 }
+                status_code = status.HTTP_200_OK
+
             except User.DoesNotExist:
                 print('error')
                 response = {"message": 'Invalid email or password'}
 
-        status_code = status.HTTP_200_OK
+                status_code = status.HTTP_400_BAD_REQUEST
         print(response)
         return Response(response, status=status_code)
 
